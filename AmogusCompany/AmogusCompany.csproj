@@ -31,6 +31,21 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>W:\Games\Lethal Company v49\Lethal Company\BepInEx\core\0Harmony.dll</HintPath>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>W:\Games\Lethal Company v49\Lethal Company\Lethal Company_Data\Managed\Assembly-CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="BepInEx">
+      <HintPath>W:\Games\Lethal Company v49\Lethal Company\BepInEx\core\BepInEx.dll</HintPath>
+    </Reference>
+    <Reference Include="LC_API">
+      <HintPath>W:\Games\Lethal Company v49\Lethal Company\BepInEx\plugins\2018-LC_API\LC_API.dll</HintPath>
+    </Reference>
+    <Reference Include="netstandard">
+      <HintPath>W:\Games\Lethal Company v49\Lethal Company\Lethal Company_Data\Managed\netstandard.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -39,9 +54,41 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="Unity.Netcode.Runtime">
+      <HintPath>W:\Games\Lethal Company v49\Lethal Company\Lethal Company_Data\Managed\Unity.Netcode.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>W:\Games\Lethal Company v49\Lethal Company\Lethal Company_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>W:\Games\Lethal Company v49\Lethal Company\Lethal Company_Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>W:\Games\Lethal Company v49\Lethal Company\Lethal Company_Data\Managed\UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>W:\Games\Lethal Company v49\Lethal Company\Lethal Company_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>W:\Games\Lethal Company v49\Lethal Company\Lethal Company_Data\Managed\UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>W:\Games\Lethal Company v49\Lethal Company\Lethal Company_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Patches\AiPatches.cs" />
+    <Compile Include="Patches\Helpers.cs" />
+    <Compile Include="Patches\Lever.cs" />
+    <Compile Include="Patches\Networking.cs" />
+    <Compile Include="Patches\Turret.cs" />
+    <Compile Include="Patches\OtherFunctions.cs" />
+    <Compile Include="Patches\PlayerControllerB.cs" />
+    <Compile Include="Patches\Vents.cs" />
+    <Compile Include="Patches\StartOfRound.cs" />
     <Compile Include="Plugin.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
