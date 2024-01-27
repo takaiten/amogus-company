@@ -32,10 +32,9 @@ namespace AmogusCompanyMod.Patches {
                 AmogusModBase.mls.LogInfo("Failed to get Player.LocalPlayer.ClientId");
             }
 
-            if (BepInEx.UnityInput.Current.GetKeyDown("F6")) {
-                AmogusModBase.mls.LogInfo("F6 pressed");
-                if (AmogusModBase.DebugMode) {
-                }
+            if (BepInEx.UnityInput.Current.GetKeyDown("F9")) {
+                AmogusModBase.DebugMode = true;
+                AmogusModBase.mls.LogInfo("Debug Mode Toggle: " + AmogusModBase.DebugMode);
             }
         }
 
@@ -61,24 +60,45 @@ namespace AmogusCompanyMod.Patches {
             if (!__instance.isFreeCamera && Physics.Raycast(interactRay, out var hit, 5f, 8)) {
                 PlayerControllerB playerLookingAt = hit.collider.gameObject.GetComponent<PlayerControllerB>();
                 if (playerLookingAt != null && __instance.playerClientId != playerLookingAt.playerClientId) {
-                    __instance.cursorTip.text = "KILL " + playerLookingAt.playerUsername;
+                    var ellapsed = Time.time - lastKillTime;
+                    if (lastKillTime > 0 && ellapsed < 60) {
+                        __instance.cursorTip.text = "KILL " + playerLookingAt.playerUsername;
+                    } else {
+                        __instance.cursorTip.text = $"KILL on cooldown: {(int)(60 - ellapsed)}s";
+                    }
                 }
             }
         }
 
+        private static float lastKillTime = -1f;
+
         [HarmonyPatch("BeginGrabObject")]
         [HarmonyPrefix]
         static public bool GrabObjectPatch(PlayerControllerB __instance) {
-            if (!AmogusModBase.impostorsIDs.Contains(Player.LocalPlayer.ClientId)) {
+            AmogusModBase.mls.LogMessage("Trying to do the sussy");
+            // Only impostor can kill
+            if (!AmogusModBase.DebugMode && !AmogusModBase.impostorsIDs.Contains(Player.LocalPlayer.ClientId)) {
                 return true;
             }
-            AmogusModBase.mls.LogMessage("Doing the sussy");
+            // Check for cooldown
+            var ellapsed = Time.time - lastKillTime;
+            AmogusModBase.mls.LogMessage($"Ellapsed: {ellapsed}; LastKill: {lastKillTime}");
+            if (lastKillTime > 0 && ellapsed < 60) {
+                return true;
+            }
+            if (AmogusModBase.DebugMode) {
+                AmogusModBase.mls.LogMessage("DEBUG: Killed someone");
+                lastKillTime = Time.time;
+                return true;
+            }
+            // Find the target player and kill
             var interactRay = new Ray(__instance.gameplayCamera.transform.position, __instance.gameplayCamera.transform.forward);
             if (Physics.Raycast(interactRay, out var hit, 5f, 8)) {
                 PlayerControllerB playerLookingAt = hit.collider.gameObject.GetComponent<PlayerControllerB>();
                 if (playerLookingAt != null && __instance.playerClientId != playerLookingAt.playerClientId) {
                     AmogusModBase.mls.LogMessage("Killing player: " + playerLookingAt.playerUsername);
                     playerLookingAt.KillPlayer(Vector3.zero, true);
+                    lastKillTime = Time.time;
                     return false;
                 }
             }
