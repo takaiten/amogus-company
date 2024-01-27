@@ -2,6 +2,8 @@
 using HarmonyLib;
 using System.Collections.Generic;
 using LC_API.GameInterfaceAPI.Features;
+using UnityEngine;
+using TMPro;
 
 namespace AmogusCompanyMod.Patches {
     [HarmonyPatch(typeof(PlayerControllerB))]
@@ -10,7 +12,6 @@ namespace AmogusCompanyMod.Patches {
         [HarmonyPatch("Update")]
         [HarmonyPostfix]
         static public void PlayerControllerUpdate() {
-
             IEnumerator<Player> activePlayers = Player.ActiveList.GetEnumerator();
             while (activePlayers.MoveNext()) {
                 if (AmogusModBase.impostorsIDs.Contains(activePlayers.Current.ClientId) && activePlayers.Current.IsControlled &&
@@ -27,54 +28,15 @@ namespace AmogusCompanyMod.Patches {
                     Player.LocalPlayer.PlayerController.sprintMeter = 1f;
                     Player.LocalPlayer.PlayerController.nightVision.enabled = true;
                 }
-
             } catch {
                 AmogusModBase.mls.LogInfo("Failed to get Player.LocalPlayer.ClientId");
             }
 
-            //get impostor status debug
-            if (BepInEx.UnityInput.Current.GetKeyDown("F5")) {
-                AmogusModBase.mls.LogInfo("F5 pressed");
-                if (AmogusModBase.DebugMode) {
-                    int a = 111111111;
-                    int b = 4;
-                    if (!AmogusModBase.impostorsIDs.Contains(Player.LocalPlayer.ClientId)) {
-                        StartOfRoundPatch.ImpostorStartGame(ref a, ref b);
-                    }
-                }
-            }
-
-            //remove impostor status debug
             if (BepInEx.UnityInput.Current.GetKeyDown("F6")) {
                 AmogusModBase.mls.LogInfo("F6 pressed");
                 if (AmogusModBase.DebugMode) {
-                    OtherFunctions.RemoveImposter();
                 }
             }
-
-            //give impostor item debug shotgun
-            if (BepInEx.UnityInput.Current.GetKeyDown("F7")) {
-                AmogusModBase.mls.LogInfo("F7 pressed");
-                if (AmogusModBase.DebugMode) {
-                    OtherFunctions.GetImpostorStartingItem(7, player: Player.LocalPlayer);
-                }
-            }
-
-
-            if (BepInEx.UnityInput.Current.GetKeyDown("F8")) {
-                AmogusModBase.mls.LogInfo("F8 pressed");
-                if (AmogusModBase.DebugMode) {
-                    Player.LocalPlayer.PlayerController.movementSpeed = 30f;
-                    Player.LocalPlayer.PlayerController.climbSpeed = 100f;
-                }
-            }
-
-            if (BepInEx.UnityInput.Current.GetKeyDown("F9")) {
-                AmogusModBase.mls.LogInfo("F9 pressed");
-                if (AmogusModBase.DebugMode) {
-                }
-            }
-
         }
 
         [HarmonyPatch("KillPlayerClientRpc")]
@@ -87,6 +49,40 @@ namespace AmogusCompanyMod.Patches {
         [HarmonyPostfix]
         static public void KillPlayerServerRpcPatch() {
             OtherFunctions.CheckForImpostorVictory();
+        }
+
+        [HarmonyPatch("SetHoverTipAndCurrentInteractTrigger")]
+        [HarmonyPostfix]
+        static public void TooltipPatch(PlayerControllerB __instance) {
+            if (!AmogusModBase.impostorsIDs.Contains(Player.LocalPlayer.ClientId)) {
+                return;
+            }
+            var interactRay = new Ray(__instance.gameplayCamera.transform.position, __instance.gameplayCamera.transform.forward);
+            if (!__instance.isFreeCamera && Physics.Raycast(interactRay, out var hit, 5f, 8)) {
+                PlayerControllerB playerLookingAt = hit.collider.gameObject.GetComponent<PlayerControllerB>();
+                if (playerLookingAt != null && __instance.playerClientId != playerLookingAt.playerClientId) {
+                    __instance.cursorTip.text = "KILL " + playerLookingAt.playerUsername;
+                }
+            }
+        }
+
+        [HarmonyPatch("BeginGrabObject")]
+        [HarmonyPrefix]
+        static public bool GrabObjectPatch(PlayerControllerB __instance) {
+            if (!AmogusModBase.impostorsIDs.Contains(Player.LocalPlayer.ClientId)) {
+                return true;
+            }
+            AmogusModBase.mls.LogMessage("Doing the sussy");
+            var interactRay = new Ray(__instance.gameplayCamera.transform.position, __instance.gameplayCamera.transform.forward);
+            if (Physics.Raycast(interactRay, out var hit, 5f, 8)) {
+                PlayerControllerB playerLookingAt = hit.collider.gameObject.GetComponent<PlayerControllerB>();
+                if (playerLookingAt != null && __instance.playerClientId != playerLookingAt.playerClientId) {
+                    AmogusModBase.mls.LogMessage("Killing player: " + playerLookingAt.playerUsername);
+                    playerLookingAt.KillPlayer(Vector3.zero, true);
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

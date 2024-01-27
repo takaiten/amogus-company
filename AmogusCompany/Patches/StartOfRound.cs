@@ -11,11 +11,8 @@ namespace AmogusCompanyMod.Patches {
     class StartOfRoundPatch {
         [HarmonyPatch("OnShipLandedMiscEvents")]
         [HarmonyPostfix]
-        public static void ImpostorStartGame(ref int ___randomMapSeed, ref int ___currentLevelID) {
+        public static void ImpostorStartGame(ref int ___currentLevelID) {
             if (___currentLevelID != 3 && Player.LocalPlayer.IsHost) {
-                //AmogusModBase.mls.LogInfo("Seed is : " + ___randomMapSeed);
-                //System.Random random = new System.Random(___randomMapSeed);
-
                 var players = Player.ActiveList.Select(playerX => playerX.ClientId).ToArray();
                 // Find N random client ids
                 var impostorClientIds = RandomSelection.SelectRandomElements(players, AmogusModBase.ConfigImpostorCount.Value);
@@ -58,7 +55,5 @@ namespace AmogusCompanyMod.Patches {
                 triggerScript.disabledHoverTip = "Impostor can't start the ship";
             }
         }
-
     }
-
 }

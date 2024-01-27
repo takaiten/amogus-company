@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using GameNetcodeStuff;
 using LC_API.GameInterfaceAPI.Features;
+using UnityEngine;
 
 namespace AmogusCompanyMod.Patches {
     class OtherFunctions {
@@ -38,71 +40,6 @@ namespace AmogusCompanyMod.Patches {
             Player.LocalPlayer.PlayerController.nightVision.enabled = false;
             AmogusModBase.mls.LogInfo("Removing Impostors");
         }
-
-        public static void GetImpostorStartingItem(int ItemNumber, Player player) {
-            string itemNameIm;
-
-            switch (ItemNumber) {
-                case 1:
-                    itemNameIm = "Shovel";
-                    break;
-                case 2:
-                    itemNameIm = "Tragedy";
-                    break;
-                case 3:
-                    itemNameIm = "Extension ladder";
-                    break;
-                case 4:
-                    itemNameIm = "Zap gun";
-                    break;
-                case 5:
-                    itemNameIm = "Stun grenade";
-                    break;
-                case 6:
-                    itemNameIm = "Shotgun";
-                    break;
-                case 7:
-                    itemNameIm = "Key";
-                    break;
-                default:
-                    itemNameIm = "";
-                    break;
-            }
-            AmogusModBase.mls.LogInfo("itemNameIm is:" + itemNameIm);
-            AmogusModBase.mls.LogInfo("ItemNumber is:" + ItemNumber);
-
-            LC_API.GameInterfaceAPI.Features.Item item;
-            item = LC_API.GameInterfaceAPI.Features.Item.CreateAndSpawnItem(itemNameIm, false, player.Position, default);
-            //item = LC_API.GameInterfaceAPI.Features.Item.CreateAndGiveItem(itemNameIm, player, true, false);
-            AmogusModBase.mls.LogInfo("item is:" + item);
-
-            item.ItemProperties.itemName = "Impostor's " + itemNameIm;
-            item.ItemProperties.twoHanded = false;
-            item.ItemProperties.isConductiveMetal = false;
-            item.ItemProperties.isScrap = false;
-            if (itemNameIm == "Tragedy") {
-                item.ScanNodeProperties.maxRange = 1;
-            }
-            AmogusModBase.mls.LogInfo("Testing item name" + item.name);
-            AmogusModBase.mls.LogInfo("Testing player name" + player.name);
-            AmogusModBase.mls.LogInfo("Trying to add item to slot");
-            if (player.IsLocalPlayer) {
-                try {
-                    Player.LocalPlayer.Inventory.TryAddItemToSlot(item, 3, false);
-                } catch {
-                    AmogusModBase.mls.LogInfo("Failed to add item to LOCAL slot 3 ");
-                }
-            } else {
-                try {
-                    player.Inventory.TryAddItemToSlot(item, 3, false);
-                } catch {
-                    AmogusModBase.mls.LogInfo("Failed to add item to slot 3");
-                }
-            }
-        }
-
-
-
     }
 }
 
