@@ -5,6 +5,7 @@ using HarmonyLib;
 using LC_API.Networking;
 using System.Collections.Generic;
 using AmogusCompanyMod.Patches;
+using UnityEngine;
 
 namespace AmogusCompanyMod {
     [BepInPlugin(modGUID, modName, modVersion)]
@@ -19,6 +20,7 @@ namespace AmogusCompanyMod {
         public static bool DebugMode = false;
 
         public static List<ulong> impostorsIDs = new List<ulong>();
+        public static float lastKillTime = Time.time;
 
         public static ConfigEntry<int> ConfigImpostorCount;
         public static ConfigEntry<bool> ConfigVents;

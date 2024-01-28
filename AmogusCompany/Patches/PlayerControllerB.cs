@@ -8,7 +8,6 @@ using TMPro;
 namespace AmogusCompanyMod.Patches {
     [HarmonyPatch(typeof(PlayerControllerB))]
     class PlayerControllerBPatch {
-
         [HarmonyPatch("Update")]
         [HarmonyPostfix]
         static public void PlayerControllerUpdate() {
@@ -60,8 +59,8 @@ namespace AmogusCompanyMod.Patches {
             if (!__instance.isFreeCamera && Physics.Raycast(interactRay, out var hit, 5f, 8)) {
                 PlayerControllerB playerLookingAt = hit.collider.gameObject.GetComponent<PlayerControllerB>();
                 if (playerLookingAt != null && __instance.playerClientId != playerLookingAt.playerClientId) {
-                    var ellapsed = Time.time - lastKillTime;
-                    if (lastKillTime > 0 && ellapsed < 60) {
+                    var ellapsed = Time.time - AmogusModBase.lastKillTime;
+                    if (ellapsed >= 60) {
                         __instance.cursorTip.text = "KILL " + playerLookingAt.playerUsername;
                     } else {
                         __instance.cursorTip.text = $"KILL on cooldown: {(int)(60 - ellapsed)}s";
@@ -70,25 +69,18 @@ namespace AmogusCompanyMod.Patches {
             }
         }
 
-        private static float lastKillTime = -1f;
-
         [HarmonyPatch("BeginGrabObject")]
         [HarmonyPrefix]
         static public bool GrabObjectPatch(PlayerControllerB __instance) {
             AmogusModBase.mls.LogMessage("Trying to do the sussy");
             // Only impostor can kill
-            if (!AmogusModBase.DebugMode && !AmogusModBase.impostorsIDs.Contains(Player.LocalPlayer.ClientId)) {
+            if (!AmogusModBase.impostorsIDs.Contains(Player.LocalPlayer.ClientId)) {
                 return true;
             }
             // Check for cooldown
-            var ellapsed = Time.time - lastKillTime;
-            AmogusModBase.mls.LogMessage($"Ellapsed: {ellapsed}; LastKill: {lastKillTime}");
-            if (lastKillTime > 0 && ellapsed < 60) {
-                return true;
-            }
-            if (AmogusModBase.DebugMode) {
-                AmogusModBase.mls.LogMessage("DEBUG: Killed someone");
-                lastKillTime = Time.time;
+            var ellapsed = Time.time - AmogusModBase.lastKillTime;
+            AmogusModBase.mls.LogMessage($"Ellapsed since last kill: {ellapsed}");
+            if (ellapsed < 60) {
                 return true;
             }
             // Find the target player and kill
@@ -98,7 +90,7 @@ namespace AmogusCompanyMod.Patches {
                 if (playerLookingAt != null && __instance.playerClientId != playerLookingAt.playerClientId) {
                     AmogusModBase.mls.LogMessage("Killing player: " + playerLookingAt.playerUsername);
                     playerLookingAt.KillPlayer(Vector3.zero, true);
-                    lastKillTime = Time.time;
+                    AmogusModBase.lastKillTime = Time.time;
                     return false;
                 }
             }

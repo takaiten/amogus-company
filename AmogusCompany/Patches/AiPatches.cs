@@ -6,14 +6,14 @@ namespace AmogusCompanyMod.Patches {
     class EnemyAiPatch {
         //Larva get stuck when it fall on impostor (at least on single player)
 
-        [HarmonyPatch(nameof(EnemyAI.PlayerIsTargetable))]
-        [HarmonyPostfix]
-        static public void MonstersDontTarget(ref PlayerControllerB playerScript, ref bool __result) {
-            if (AmogusModBase.impostorsIDs.Contains(playerScript.actualClientId)) {
-                __result = false;
-                AmogusModBase.mls.LogInfo("Player " + playerScript.actualClientId + " is impostor and is not targetable");
-            }
-        }
+        //[HarmonyPatch(nameof(EnemyAI.PlayerIsTargetable))]
+        //[HarmonyPostfix]
+        //static public void MonstersDontTarget(ref PlayerControllerB playerScript, ref bool __result) {
+        //    if (AmogusModBase.impostorsIDs.Contains(playerScript.actualClientId)) {
+        //        __result = false;
+        //        AmogusModBase.mls.LogInfo("Player " + playerScript.actualClientId + " is impostor and is not targetable");
+        //    }
+        //}
 
         [HarmonyPatch((typeof(EnemyAI)), (nameof(EnemyAI.MeetsStandardPlayerCollisionConditions)))]
         [HarmonyPostfix]

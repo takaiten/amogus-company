@@ -4,6 +4,7 @@ using LC_API.GameInterfaceAPI.Features;
 using LC_API.Networking;
 using LCShrinkRay.comp;
 using AmogusCompanyMod.Helpers;
+using UnityEngine;
 
 namespace AmogusCompanyMod.Patches {
 
@@ -20,6 +21,7 @@ namespace AmogusCompanyMod.Patches {
                 // And set them as impostors
                 AmogusModBase.impostorsIDs.Clear();
                 AmogusModBase.impostorsIDs.AddRange(impostorClientIds);
+                AmogusModBase.lastKillTime = Time.time;
 
                 NetworkingPatch.SynchronizeImpList();
                 ImpostorLever();
